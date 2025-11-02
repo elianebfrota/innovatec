@@ -1,0 +1,62 @@
+#include <Wire.h> //Biblioteca padrão do Arduino para ler I2C
+#include <Adafruit_MPU6050.h> // biblioteca que controla o sensor, o giroscopio e acelerômetro, e faz conversões automáticas
+#include <Adafruit_Sensor.h> // define tipos de dados padrão (sensors_event_t)
+
+Adafruit_MPU6050 mpu; // mpu é o obejto que representa o sensr no código; 
+
+//Mão direita 
+int dpolegar= 32;
+int dindicador= 33;
+int dmedio= 34;
+int danelar= 35;
+int dminimo= 36;
+
+int pinos[5]= {dpolegar, dindicador, dmedio, danelar, dminimo};
+int valores [5];
+
+//INICIA O SENSOR E DEFINE FILTROS E FAIXAS 
+void setup() {
+  Serial.begin(115200); //incial o serial monitor para enviar dados do sensor
+  bool iniciado= mpu.begin(); 
+
+// testar se o MPU6050  foi inicializado 
+if(!iniciado) {
+  Serial.println("Erro ao inicializar!");
+  while (1); // trava o código em caso de erro grave
+}
+  Serial.println("MPU6050 inciado!");
+  mpu.setAccelerometerRange(MPU6050_RANGE_2_G); // mede  a aceleração dentro de um intervalo específico
+  mpu.setGyroRange(MPU6050_RANGE_250_DEG); // faixa do giroscópio 
+  mpu.setFilterBandwidth(MPU6050_BAND_20_HZ); //define quais frequencias de movimento o sensor vai aceitar 
+
+}
+
+void loop() {
+  // a struct já vem definida dentro da biblioteca adafruit 
+  sensors_event_t acelerometro, giroscopio, temperatura;
+  mpu.getEvent(&acelerometro, &giroscopio, &temperatura); //lê e preenche os valores das variáveis; 
+
+  //acessando os valores das variáveis 
+  float acelaracaoX= acelerometro.acceleration.x;
+  float aceleracaoY= acelerometro.acceleration.y; 
+  float aceleracaoZ= acelerometro.acceleration.z;
+
+  //giroscopio
+
+  float giroscopioX= giroscopio.gyro.x;
+  float giroscopioY= giroscopio.gyro.y;
+  float giroscopioZ= giroscopio.gyro.z;
+
+  Serial.println(giroscopioX);
+
+  // Coleta dos dados do potenciômetro 
+  for (int i=0; i<5;i++){
+  valores[i]= analogRead(pinos[i]);
+
+}
+
+  delay(10); //definir
+
+  //exemplo de conversão 
+  int digitalX = map((int)angleX, -90, 90, 0, 1023);
+
